@@ -34,12 +34,12 @@ public class PaysDaoImpl implements IPaysDao {
     }
 
     @Override
-    public List<Pays> paysParNom(String nom) {
+    public List<Pays> paysParMC(String mc) {  // Ensure method name matches IPaysDao
         List<Pays> paysList = new ArrayList<>();
         Connection conn = SingletonConnection.getConnection();
         try {
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM PAYS WHERE NOM_PAYS LIKE ?");
-            ps.setString(1, "%" + nom + "%");
+            ps.setString(1, "%" + mc + "%");
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Pays p = new Pays();
