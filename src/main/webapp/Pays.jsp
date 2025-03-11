@@ -9,6 +9,7 @@
     <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
+<%@include file="header.jsp" %>
     <p></p>
     <div class="container">
         <div class="card">
@@ -32,7 +33,10 @@
                             <td>${p.nomPays}</td>
                             <td>${p.population}</td>
                             <td>${p.continent}</td>
-                        </tr>
+							<td><a onclick="return confirm('Etes-vous sûr ?')"
+								href="supprimer.do?id=${p.idPays }">Supprimer</a></td>
+							<td><a href="editer.do?id=${p.idPays }">Edit</a></td>
+						</tr>
                     </c:forEach>
                 </table>
             </div>

@@ -17,7 +17,7 @@
 
     <table border="1" width="80%">
         <tr>
-            <th>ID</th> <th>Nom</th> <th>Population</th> <th>Continent</th>
+            <th>ID</th> <th>Nom</th> <th>Population</th> <th>Continent</th><th>Suppression</th><th>Edition</th>
         </tr>
         <c:forEach items="${modele.paysList}" var="p">
             <tr>

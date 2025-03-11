@@ -25,9 +25,8 @@ public class ControleurServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String path = request.getServletPath();
-        System.out.println("Request received for: " + path);
         if (path.equals("/index.do")) {
-            request.getRequestDispatcher("pays.jsp").forward(request, response);
+            request.getRequestDispatcher("Pays.jsp").forward(request, response);
 
         } else if (path.equals("/chercher.do")) {
             String motCle = request.getParameter("motCle");
@@ -36,9 +35,53 @@ public class ControleurServlet extends HttpServlet {
             List<Pays> paysList = metier.paysParMC(motCle);
             model.setPaysList(paysList);
             request.setAttribute("model", model);
-            request.getRequestDispatcher("pays.jsp").forward(request, response);
+            request.getRequestDispatcher("Pays.jsp").forward(request, response);
         
-        } else {
+            
+          
+        } else if (path.equals("/saisie.do")) {
+            request.getRequestDispatcher("saisiePays.jsp").forward(request, response); 
+
+        } else if (path.equals("/save.do") && request.getMethod().equals("POST")) {
+            String nom = request.getParameter("nomPays");
+            int population = Integer.parseInt(request.getParameter("population"));
+            String continent = request.getParameter("continent");
+            Pays p = metier.save(new Pays(nom, population, continent));
+            request.setAttribute("pays", p);
+            request.getRequestDispatcher("confirmation.jsp").forward(request, response); 
+
+            
+        } else if (path.equals("/supprimer.do")) {
+            Long id = Long.parseLong(request.getParameter("id"));
+            metier.deletePays(id);
+            response.sendRedirect("chercher.do?motCle=");
+
+        }else if (path.equals("/editer.do")) {
+            Long id = Long.parseLong(request.getParameter("id"));
+            Pays p = metier.getPays(id); 
+            request.setAttribute("pays", p);
+            request.getRequestDispatcher("editerPays.jsp").forward(request, response); 
+        } 
+
+        else if (path.equals("/update.do")) {
+            Long id = Long.parseLong(request.getParameter("idPays")); 
+            String nom = request.getParameter("nomPays");
+            int population = Integer.parseInt(request.getParameter("population"));
+            String continent = request.getParameter("continent");
+
+            
+            Pays p = new Pays();
+            p.setIdPays(id);
+            p.setNomPays(nom);
+            p.setPopulation(population);
+            p.setContinent(continent);
+
+            metier.updatePays(p); 
+            request.setAttribute("pays", p);
+            //request.getRequestDispatcher("confirmation.jsp").forward(request, response);
+            response.sendRedirect("chercher.do?motCle=");
+        }
+        else {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
     }

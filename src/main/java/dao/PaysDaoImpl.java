@@ -14,19 +14,23 @@ public class PaysDaoImpl implements IPaysDao {
     public Pays save(Pays p) {
         Connection conn = SingletonConnection.getConnection();
         try {
-            PreparedStatement ps = conn.prepareStatement("INSERT INTO PAYS(NOM_PAYS, POPULATION, CONTINENT) VALUES(?,?,?)");
+            PreparedStatement ps = conn.prepareStatement(
+                "INSERT INTO PAYS(NOM_PAYS, POPULATION, CONTINENT) VALUES(?,?,?)",
+                PreparedStatement.RETURN_GENERATED_KEYS
+            );
             ps.setString(1, p.getNomPays());
             ps.setInt(2, p.getPopulation());
             ps.setString(3, p.getContinent());
             ps.executeUpdate();
 
-            PreparedStatement ps2 = conn.prepareStatement("SELECT MAX(ID_PAYS) as MAX_ID FROM PAYS");
-            ResultSet rs = ps2.executeQuery();
+            // ✅ Get the generated ID instead of using MAX(ID_PAYS)
+            ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
-                p.setIdPays(rs.getLong("MAX_ID"));
+                p.setIdPays(rs.getLong(1));
             }
+
+            rs.close();
             ps.close();
-            ps2.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -34,13 +38,14 @@ public class PaysDaoImpl implements IPaysDao {
     }
 
     @Override
-    public List<Pays> paysParMC(String mc) {  // Ensure method name matches IPaysDao
+    public List<Pays> paysParMC(String mc) {
         List<Pays> paysList = new ArrayList<>();
         Connection conn = SingletonConnection.getConnection();
         try {
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM PAYS WHERE NOM_PAYS LIKE ?");
             ps.setString(1, "%" + mc + "%");
             ResultSet rs = ps.executeQuery();
+
             while (rs.next()) {
                 Pays p = new Pays();
                 p.setIdPays(rs.getLong("ID_PAYS"));
@@ -49,6 +54,9 @@ public class PaysDaoImpl implements IPaysDao {
                 p.setContinent(rs.getString("CONTINENT"));
                 paysList.add(p);
             }
+
+            rs.close();
+            ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -58,17 +66,22 @@ public class PaysDaoImpl implements IPaysDao {
     @Override
     public Pays getPays(Long id) {
         Connection conn = SingletonConnection.getConnection();
-        Pays p = new Pays();
+        Pays p = null;
         try {
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM PAYS WHERE ID_PAYS = ?");
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
+
             if (rs.next()) {
+                p = new Pays();
                 p.setIdPays(rs.getLong("ID_PAYS"));
                 p.setNomPays(rs.getString("NOM_PAYS"));
                 p.setPopulation(rs.getInt("POPULATION"));
                 p.setContinent(rs.getString("CONTINENT"));
             }
+
+            rs.close();
+            ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -79,7 +92,9 @@ public class PaysDaoImpl implements IPaysDao {
     public Pays updatePays(Pays p) {
         Connection conn = SingletonConnection.getConnection();
         try {
-            PreparedStatement ps = conn.prepareStatement("UPDATE PAYS SET NOM_PAYS=?, POPULATION=?, CONTINENT=? WHERE ID_PAYS=?");
+            PreparedStatement ps = conn.prepareStatement(
+                "UPDATE PAYS SET NOM_PAYS=?, POPULATION=?, CONTINENT=? WHERE ID_PAYS=?"
+            );
             ps.setString(1, p.getNomPays());
             ps.setInt(2, p.getPopulation());
             ps.setString(3, p.getContinent());
@@ -105,4 +120,5 @@ public class PaysDaoImpl implements IPaysDao {
         }
     }
 }
+
 
