@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 import dao.IPaysDao;
 import dao.PaysDaoImpl;
 import metier.entities.Pays;
-import org.apache.catalina.connector.Response;
+
 
 @WebServlet(name = "cs", urlPatterns = { "/controleur", "*.do" }) 
 public class ControleurServlet extends HttpServlet {
